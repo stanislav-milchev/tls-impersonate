@@ -2,35 +2,41 @@ package main
 
 import (
 	"fmt"
+    fhttp "github.com/Danny-Dasilva/fhttp"
+	"github.com/Danny-Dasilva/CycleTLS/cycletls"
 	"io"
 	"log"
-
-	http "github.com/Carcraftz/fhttp"
 )
 
 func main() {
 	port := ":42069"
 	log.Printf("Listening on port %s", port)
-	http.HandleFunc("/", HandleReq)
+	fhttp.HandleFunc("/", HandleReq)
 
-	err := http.ListenAndServe(port, nil)
+	err := fhttp.ListenAndServe(port, nil)
 	if err != nil {
 		log.Fatalln("Error starting the HTTP server:", err)
 	}
 }
 
 // HandleReq takes the incoming request, parses it, sends it towards the
-func HandleReq(w http.ResponseWriter, r *http.Request) {
+func HandleReq(w fhttp.ResponseWriter, r *fhttp.Request) {
 	url := r.Header.Get("tls-request")
 	method := r.Method
-	req, err := http.NewRequest(method, url, nil)
 
+	req, err := fhttp.NewRequest(method, url, nil)
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
 
-	client := &http.Client{}
+	ja3 := "771,4865-4866-4867-49195-49199-49196-49200-52393-52392-49171-49172-156-157-47-53,0-17513-18-16-10-23-13-65281-43-5-51-11-65037-27-35-45,29-23-24,0"
+	ua := "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36 OPR/107.0.0.0"
+
+	client := &fhttp.Client{
+		Transport: cycletls.NewTransport(ja3, ua),
+	}
+
 	res, err := client.Do(req)
 
 	if err != nil {
