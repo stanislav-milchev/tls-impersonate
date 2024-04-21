@@ -83,7 +83,21 @@ func HandleReq(w fhttp.ResponseWriter, r *fhttp.Request) {
 		}
 	}
 
+	// Forward the headers received
 	w.WriteHeader(res.StatusCode)
+	for h, v := range res.Header {
+		// Response we get is already decoded so this header will only cause issues with the
+		// client used for the request
+		if "content-encoding" == strings.ToLower(h) {
+			continue
+		}
+		if len(v) > 0 {
+			w.Header().Set(h, v[0])
+		} else {
+			fmt.Printf("Skipping \"%s\" header with invalid value", h)
+			continue
+		}
+	}
 
 	// Either return buffered response or a stream
 	if !stream {
@@ -131,6 +145,7 @@ func NewRequest(r *fhttp.Request) (*azuretls.Session, *azuretls.Request, error) 
 	timeout := time.Duration(t) * time.Second
 	session.SetTimeout(timeout)
 
+	// Parse proxy
 	// proxy := r.Header.Get("x-tls-proxy")
 
 	req := &azuretls.Request{
