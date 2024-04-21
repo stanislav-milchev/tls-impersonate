@@ -10,8 +10,8 @@ git.apache.org/thrift.git v0.0.0-20180902110319-2566ecd5d999/go.mod h1:fPE2ZNJGy
 github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03qcyfWMU=
 github.com/Danny-Dasilva/fhttp v0.0.0-20240217042913-eeeb0b347ce1 h1:/lqhaiz7xdPr6kuaW1tQ/8DdpWdxkdyd9W/6EHz4oRw=
 github.com/Danny-Dasilva/fhttp v0.0.0-20240217042913-eeeb0b347ce1/go.mod h1:Hvab/V/YKCDXsEpKYKHjAXH5IFOmoq9FsfxjztEqvDc=
-github.com/Noooste/azuretls-client v1.4.10 h1:zBLRLVViUgfTFV7tIc8lf7uigeNMAoCcpausm8X2FUk=
-github.com/Noooste/azuretls-client v1.4.10/go.mod h1:Fwy2+azpB5bqdud9P4ioFupkxdBY/oNJ0wXooYTdoNE=
+github.com/Noooste/azuretls-client v1.4.11 h1:J67IM4KhgZvJ3MBGzcVO9TTEjJLRlsX/rWg5kLWtMzI=
+github.com/Noooste/azuretls-client v1.4.11/go.mod h1:Fwy2+azpB5bqdud9P4ioFupkxdBY/oNJ0wXooYTdoNE=
 github.com/Noooste/fhttp v1.0.12 h1:2N15bIATKaC6q+LVyRGyxPyuqEPvwAS3Uk1peC3YVHU=
 github.com/Noooste/fhttp v1.0.12/go.mod h1:CMVxKOhNheqJN5HYE4Rlvz2SRdV8Uv7YWmi6OwmB/Bk=
 github.com/Noooste/utls v1.2.9 h1:VLNs0WmPFjswU4PxXTHl0AY4sarHi+638c3cSI9Hsng=

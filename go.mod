@@ -4,7 +4,7 @@ go 1.22.2
 
 require (
 	github.com/Danny-Dasilva/fhttp v0.0.0-20240217042913-eeeb0b347ce1
-	github.com/Noooste/azuretls-client v1.4.10
+	github.com/Noooste/azuretls-client v1.4.11
 	github.com/davidmytton/url-verifier v1.0.1
 )
 
