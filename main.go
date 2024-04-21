@@ -84,20 +84,23 @@ func HandleReq(w fhttp.ResponseWriter, r *fhttp.Request) {
 
 func NewRequest(r *fhttp.Request) (*azuretls.Request, error) {
 	// Parse and validate request URL
-	url := r.Header.Get("x-tls-url")
-	res, err := verifier.Verify(url)
+	urlHeader := r.Header.Get("x-tls-url")
+	res, err := verifier.Verify(urlHeader)
 	if err != nil || res.IsURL == false {
 		return nil, errors.New("No valid request URL supplied via 'x-tls-url'; skipping request")
 	}
 
-	timeout := r.Header.Get("x-tls-timeout")
 	// proxy := r.Header.Get("x-tls-proxy")
-	// redirects := r.Header.Get("x-tls-redirects")
+
+	// Parse redirects
+	disableRedirects := r.Header.Get("x-tls-disable-redirects") != ""
+
 	method := r.Method
 
 	// Parse timeout
-	t, err := strconv.Atoi(timeout)
-	if err != nil {
+    timeoutHeader := r.Header.Get("x-tls-timeout")
+	t, err := strconv.Atoi(timeoutHeader)
+	if err != nil || t <= 0 {
 		// Probably dont log that on every request? Do it once and disable a flag or sth
 		log.Println("Invalid timeout value supplied, defaulting to 30s.")
 		t = 30
@@ -105,9 +108,9 @@ func NewRequest(r *fhttp.Request) (*azuretls.Request, error) {
 
 	req := azuretls.Request{
 		Method:           method,
-		Url:              url,
+		Url:              urlHeader,
 		TimeOut:          time.Duration(t) * time.Second,
-		DisableRedirects: true,
+		DisableRedirects: disableRedirects,
 	}
 	return &req, nil
 }
