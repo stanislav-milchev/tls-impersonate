@@ -25,10 +25,19 @@ func main() {
 	port := ":42069"
 	log.Printf("Listening on localhost%s", port)
 	fhttp.HandleFunc("/", HandleReq)
+	// dev testing endpoints
 	fhttp.HandleFunc("/sleep", TimeoutChecker)
+	fhttp.HandleFunc("/headers", handleHeaderYoink)
 	err := fhttp.ListenAndServe(port, nil)
 	if err != nil {
 		log.Fatalln("Error starting the HTTP server:", err)
+	}
+}
+
+// TimeoutChecker is a helper endpoint to debug timeouts
+func handleHeaderYoink(_ fhttp.ResponseWriter, r *fhttp.Request) {
+	for header, value := range r.Header {
+		fmt.Printf("{\"%s\", \"%s\"}\n", header, value[0])
 	}
 }
 
@@ -50,7 +59,7 @@ func HandleReq(w fhttp.ResponseWriter, r *fhttp.Request) {
 
 	defer session.Close()
 
-    session.OrderedHeaders = browser.CHROME
+	session.OrderedHeaders = browser.Chrome124
 	res, err := session.Do(req)
 
 	if err != nil {
