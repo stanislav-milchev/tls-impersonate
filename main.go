@@ -112,6 +112,8 @@ func HandleReq(w fhttp.ResponseWriter, r *fhttp.Request) {
 	}
 }
 
+// NewRequest opens a new azuretls session and a request, and sets it up with url,
+// proxy, headers, cookies, redirects and timeouts
 func NewRequest(r *fhttp.Request) (*azuretls.Session, *azuretls.Request, error) {
 	// Open and set-up session
 	session := azuretls.NewSession()
@@ -151,6 +153,7 @@ func NewRequest(r *fhttp.Request) (*azuretls.Session, *azuretls.Request, error) 
 	return session, req, nil
 }
 
+// SetHeaders sets the custom headers received in the server to the session
 func SetHeaders(s *azuretls.Session, headers fhttp.Header) {
 	browserHeaders := browser.Chrome124
 
