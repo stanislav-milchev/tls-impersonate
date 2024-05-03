@@ -28,13 +28,14 @@ func main() {
 	// dev testing endpoints
 	fhttp.HandleFunc("/sleep", TimeoutChecker)
 	fhttp.HandleFunc("/headers", handleHeaderYoink)
+
 	err := fhttp.ListenAndServe(port, nil)
 	if err != nil {
 		log.Fatalln("Error starting the HTTP server:", err)
 	}
 }
 
-// TimeoutChecker is a helper endpoint to debug timeouts
+// handleHeaderYoink is a helper endpoint to get the header values of the current request
 func handleHeaderYoink(_ fhttp.ResponseWriter, r *fhttp.Request) {
 	for header, value := range r.Header {
 		fmt.Printf("{\"%s\", \"%s\"}\n", header, value[0])
@@ -46,7 +47,7 @@ func TimeoutChecker(w fhttp.ResponseWriter, r *fhttp.Request) {
 	time.Sleep(time.Second * 45)
 }
 
-// HandleReq takes the incoming request, parses it, sends it towards the
+// HandleReq takes the incoming request, parses it, sends it towards the target host
 func HandleReq(w fhttp.ResponseWriter, r *fhttp.Request) {
 	stream := r.Header.Get("x-tls-stream") != ""
 
@@ -108,7 +109,6 @@ func HandleReq(w fhttp.ResponseWriter, r *fhttp.Request) {
 			log.Printf("Error streaming response: %v", err)
 		}
 
-		// Close the response body
 		res.RawBody.Close()
 	}
 }
@@ -140,7 +140,8 @@ func NewRequest(r *fhttp.Request) (*azuretls.Session, *azuretls.Request, error) 
 	session.SetTimeout(timeout)
 
 	// Parse proxy
-	// proxy := r.Header.Get("x-tls-proxy")
+	proxy := r.Header.Get("x-tls-proxy")
+	session.SetProxy(proxy)
 
 	req := &azuretls.Request{
 		Method:           r.Method,
