@@ -59,8 +59,7 @@ func HandleReq(w fhttp.ResponseWriter, r *fhttp.Request) {
 	}
 
 	defer session.Close()
-
-	session.OrderedHeaders = browser.Chrome124
+	SetHeaders(session, r.Header)
 	res, err := session.Do(req)
 
 	if err != nil {
@@ -150,4 +149,23 @@ func NewRequest(r *fhttp.Request) (*azuretls.Session, *azuretls.Request, error) 
 		IgnoreBody:       true,
 	}
 	return session, req, nil
+}
+
+func SetHeaders(s *azuretls.Session, headers fhttp.Header) {
+	browserHeaders := browser.Chrome124
+
+	for k, v := range headers {
+		// Dont send the custom request headers
+		if strings.Contains(strings.ToLower(k), "x-tls-") {
+			continue
+		}
+
+		exist := browserHeaders.Get(strings.ToLower(k)) != ""
+		if !exist {
+			browserHeaders = append(browserHeaders, []string{k, v[0]})
+			fmt.Printf("added %s\nwith val: %s\n", k, v[0])
+		}
+	}
+
+	s.OrderedHeaders = browserHeaders
 }
