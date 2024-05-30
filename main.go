@@ -1,28 +1,29 @@
 package main
 
 import (
-	"errors"
 	"fmt"
 	"io"
 	"log"
+	"os"
 	"strconv"
 	"strings"
 	"time"
 
 	fhttp "github.com/Danny-Dasilva/fhttp"
 	"github.com/Noooste/azuretls-client"
-	urlverifier "github.com/davidmytton/url-verifier"
 	"github.com/stanislav-milchev/tls-impersonator/browser"
 )
 
-var verifier *urlverifier.Verifier
-
-func init() {
-	verifier = urlverifier.NewVerifier()
-}
+var (
+	urlHeaderName      = getEnv("TLS_URL", "x-tls-url")
+	proxyHeaderName    = getEnv("TLS_PROXY", "x-tls-proxy")
+	streamHeaderName   = getEnv("TLS_STREAM", "x-tls-stream")
+	redirectHeaderName = getEnv("TLS_REDIRECT", "x-tls-allowredirect")
+	timeoutHeaderName  = getEnv("TLS_TIMEOUT", "x-tls-timeout")
+)
 
 func main() {
-	port := ":42069"
+	port := ":8082"
 	log.Printf("Listening on localhost%s", port)
 	fhttp.HandleFunc("/", HandleReq)
 	// dev testing endpoints
@@ -49,8 +50,6 @@ func TimeoutChecker(w fhttp.ResponseWriter, r *fhttp.Request) {
 
 // HandleReq takes the incoming request, parses it, sends it towards the target host
 func HandleReq(w fhttp.ResponseWriter, r *fhttp.Request) {
-	stream := r.Header.Get("x-tls-stream") != ""
-
 	session, req, err := NewRequest(r)
 	if err != nil {
 		log.Print(err)
@@ -93,6 +92,7 @@ func HandleReq(w fhttp.ResponseWriter, r *fhttp.Request) {
 		}
 	}
 
+	stream := r.Header.Get(streamHeaderName) != ""
 	// Either return buffered response or a stream
 	if !stream {
 		// Read the body and return buffered response
@@ -120,17 +120,19 @@ func NewRequest(r *fhttp.Request) (*azuretls.Session, *azuretls.Request, error) 
 	session.EnableLog()
 
 	// Parse and validate request URL
-	urlHeader := r.Header.Get("x-tls-url")
-	res, err := verifier.Verify(urlHeader)
-	if err != nil || res.IsURL == false {
-		return nil, nil, errors.New("No valid request URL supplied via 'x-tls-url'; skipping request")
+	urlHeader := r.Header.Get(urlHeaderName)
+
+	if urlHeader == "" {
+		return nil, nil, fmt.Errorf(
+			"no valid request URL supplied via '%s'; skipping request", urlHeaderName,
+		)
 	}
 
 	// Parse redirects
-	disableRedirects := r.Header.Get("x-tls-disable-redirects") != ""
+	disableRedirects := r.Header.Get(redirectHeaderName) != ""
 
 	// Parse timeout
-	timeoutHeader := r.Header.Get("x-tls-timeout")
+	timeoutHeader := r.Header.Get(timeoutHeaderName)
 	t, err := strconv.Atoi(timeoutHeader)
 	if err != nil || t <= 0 {
 		// Probably dont log that on every request? Do it once and disable a flag or sth
@@ -141,7 +143,7 @@ func NewRequest(r *fhttp.Request) (*azuretls.Session, *azuretls.Request, error) 
 	session.SetTimeout(timeout)
 
 	// Parse proxy
-	proxy := r.Header.Get("x-tls-proxy")
+	proxy := r.Header.Get(proxyHeaderName)
 	session.SetProxy(proxy)
 
 	req := &azuretls.Request{
@@ -155,12 +157,21 @@ func NewRequest(r *fhttp.Request) (*azuretls.Session, *azuretls.Request, error) 
 
 // SetHeaders sets the custom headers received in the server to the session
 func SetHeaders(s *azuretls.Session, headers fhttp.Header) {
-	browserHeaders := browser.Chrome124
-
+	browserHeaders := browser.Chrome120
+	customHeaderNames := []string{
+		urlHeaderName,
+		proxyHeaderName,
+		redirectHeaderName,
+		timeoutHeaderName,
+		streamHeaderName,
+	}
+Outer:
 	for k, v := range headers {
 		// Dont send the custom request headers
-		if strings.Contains(strings.ToLower(k), "x-tls-") {
-			continue
+		for _, header := range customHeaderNames {
+			if strings.ToLower(header) == strings.ToLower(k) {
+				continue Outer
+			}
 		}
 
 		exist := browserHeaders.Get(strings.ToLower(k)) != ""
@@ -171,4 +182,12 @@ func SetHeaders(s *azuretls.Session, headers fhttp.Header) {
 	}
 
 	s.OrderedHeaders = browserHeaders
+}
+
+func getEnv(key, fallback string) string {
+	if value, ok := os.LookupEnv(key); ok {
+		return value
+
+	}
+	return fallback
 }
