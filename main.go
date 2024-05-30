@@ -26,6 +26,7 @@ func main() {
 	port := ":8082"
 	log.Printf("Listening on localhost%s", port)
 	fhttp.HandleFunc("/", HandleReq)
+	fhttp.HandleFunc("/isalive", HandleIsAlive)
 	// dev testing endpoints
 	fhttp.HandleFunc("/sleep", TimeoutChecker)
 	fhttp.HandleFunc("/headers", handleHeaderYoink)
@@ -48,6 +49,12 @@ func TimeoutChecker(w fhttp.ResponseWriter, r *fhttp.Request) {
 	time.Sleep(time.Second * 45)
 }
 
+func HandleIsAlive(w fhttp.ResponseWriter, r *fhttp.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(fhttp.StatusOK)
+	fmt.Fprintf(w, `{"isalive":true}`)
+}
+
 // HandleReq takes the incoming request, parses it, sends it towards the target host
 func HandleReq(w fhttp.ResponseWriter, r *fhttp.Request) {
 	session, req, err := NewRequest(r)
@@ -63,15 +70,14 @@ func HandleReq(w fhttp.ResponseWriter, r *fhttp.Request) {
 
 	if err != nil {
 		if strings.Contains(err.Error(), "timeout") {
-			fmt.Print("timeout", err)
+			fmt.Print("timeout\n", err)
 			w.WriteHeader(fhttp.StatusRequestTimeout)
 			return
 		} else {
 			// TODO: EOF error encountered here at one point. Doesn't seem to happen now.
 			// Potentially could be 'Connection' header issue
-			fmt.Print("other error:", err)
-			w.WriteHeader(res.StatusCode)
-			w.Write(res.Body)
+			fmt.Print("other error:\n", err)
+			w.WriteHeader(fhttp.StatusInternalServerError)
 			return
 		}
 	}
