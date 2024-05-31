@@ -163,7 +163,7 @@ func NewRequest(r *fhttp.Request) (*azuretls.Session, *azuretls.Request, error) 
 
 // SetHeaders sets the custom headers received in the server to the session
 func SetHeaders(s *azuretls.Session, headers fhttp.Header) {
-	browserHeaders := browser.Chrome120
+	browserHeaders := browser.Chrome126
 	customHeaderNames := []string{
 		urlHeaderName,
 		proxyHeaderName,
