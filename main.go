@@ -183,7 +183,7 @@ Outer:
 		exist := browserHeaders.Get(strings.ToLower(k)) != ""
 		if !exist {
 			browserHeaders = append(browserHeaders, []string{k, v[0]})
-			fmt.Printf("added %s\nwith val: %s\n", k, v[0])
+			//fmt.Printf("added %s\nwith val: %s\n", k, v[0])
 		}
 	}
 
