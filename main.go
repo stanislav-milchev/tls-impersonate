@@ -157,6 +157,7 @@ func NewRequest(r *fhttp.Request) (*azuretls.Session, *azuretls.Request, error) 
 		Url:              urlHeader,
 		DisableRedirects: disableRedirects,
 		IgnoreBody:       true,
+		Body:             r.Body,
 	}
 	return session, req, nil
 }
