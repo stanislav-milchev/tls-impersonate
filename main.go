@@ -152,13 +152,21 @@ func NewRequest(r *fhttp.Request) (*azuretls.Session, *azuretls.Request, error) 
 	proxy := r.Header.Get(proxyHeaderName)
 	session.SetProxy(proxy)
 
+	var body any
+	if r.Method == fhttp.MethodPost {
+		body = r.Body
+	} else {
+		body = nil
+	}
+
 	req := &azuretls.Request{
 		Method:           r.Method,
 		Url:              urlHeader,
 		DisableRedirects: disableRedirects,
 		IgnoreBody:       true,
-		Body:             r.Body,
+		Body:             body,
 	}
+
 	return session, req, nil
 }
 
