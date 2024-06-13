@@ -7,7 +7,7 @@ import (
 // TODO: update default browser headers
 var (
 	Chrome126 = azuretls.OrderedHeaders{
-		{"sec-ch-ua", `"Chromium";v="126", "Google Chrome";v="126", "Not-A.Brand";v="99"`},
+		{"sec-ch-ua", `"Not/A)Brand";v="8", "Chromium";v="126", "Google Chrome";v="126"`},
 		{"sec-ch-ua-mobile", "?0"},
 		{"sec-ch-ua-platform", `"Windows"`},
 		{"upgrade-insecure-requests", "1"},
@@ -19,7 +19,7 @@ var (
 		{"sec-fetch-dest", "document"},
 		{"accept-encoding", "gzip, deflate, br, zstd"},
 		{"accept-language", "en-US,en;q=0.9"},
-		{"priority", "u=0, 1"},
+		{"priority", "u=0, i"},
 	}
 	Chrome124 = azuretls.OrderedHeaders{
 		{"sec-ch-ua", `"Chromium";v="124", "Google Chrome";v="124", "Not-A.Brand";v="99"`},
