@@ -4,7 +4,7 @@ go 1.22.2
 
 require (
 	github.com/Danny-Dasilva/fhttp v0.0.0-20240217042913-eeeb0b347ce1
-	github.com/Noooste/azuretls-client v1.4.16
+	github.com/Noooste/azuretls-client v1.4.17-0.20240613224518-bb4f02e8cbcc
 )
 
 require (

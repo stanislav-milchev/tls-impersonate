@@ -12,6 +12,8 @@ github.com/Danny-Dasilva/fhttp v0.0.0-20240217042913-eeeb0b347ce1 h1:/lqhaiz7xdP
 github.com/Danny-Dasilva/fhttp v0.0.0-20240217042913-eeeb0b347ce1/go.mod h1:Hvab/V/YKCDXsEpKYKHjAXH5IFOmoq9FsfxjztEqvDc=
 github.com/Noooste/azuretls-client v1.4.16 h1:lpliILhc4Xm9Fm66p2Ou+eVMtFe6IA8GsyTXVD80JWo=
 github.com/Noooste/azuretls-client v1.4.16/go.mod h1:xKz4e+/xGkAclwFZzCCiS58bNI5WTKvhkXJIbX2HWRE=
+github.com/Noooste/azuretls-client v1.4.17-0.20240613224518-bb4f02e8cbcc h1:moxI5wdmQYfyCXPh/LhXN/Q0SPT/6WK1dJM4IgA33F4=
+github.com/Noooste/azuretls-client v1.4.17-0.20240613224518-bb4f02e8cbcc/go.mod h1:xKz4e+/xGkAclwFZzCCiS58bNI5WTKvhkXJIbX2HWRE=
 github.com/Noooste/fhttp v1.0.12 h1:2N15bIATKaC6q+LVyRGyxPyuqEPvwAS3Uk1peC3YVHU=
 github.com/Noooste/fhttp v1.0.12/go.mod h1:CMVxKOhNheqJN5HYE4Rlvz2SRdV8Uv7YWmi6OwmB/Bk=
 github.com/Noooste/utls v1.2.9 h1:VLNs0WmPFjswU4PxXTHl0AY4sarHi+638c3cSI9Hsng=
