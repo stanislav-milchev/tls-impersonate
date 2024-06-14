@@ -15,11 +15,11 @@ import (
 )
 
 var (
-	urlHeaderName      = getEnv("TLS_URL", "x-tls-url")
-	proxyHeaderName    = getEnv("TLS_PROXY", "x-tls-proxy")
-	streamHeaderName   = getEnv("TLS_STREAM", "x-tls-stream")
-	redirectHeaderName = getEnv("TLS_REDIRECT", "x-tls-allowredirect")
-	timeoutHeaderName  = getEnv("TLS_TIMEOUT", "x-tls-timeout")
+	urlHeaderName       = getEnv("TLS_URL", "x-tls-url")
+	proxyHeaderName     = getEnv("TLS_PROXY", "x-tls-proxy")
+	bufferingHeaderName = getEnv("TLS_BUFFER", "x-tls-buffer")
+	redirectHeaderName  = getEnv("TLS_REDIRECT", "x-tls-allowredirect")
+	timeoutHeaderName   = getEnv("TLS_TIMEOUT", "x-tls-timeout")
 )
 
 func main() {
@@ -98,9 +98,9 @@ func HandleReq(w fhttp.ResponseWriter, r *fhttp.Request) {
 		}
 	}
 
-	stream := r.Header.Get(streamHeaderName) != ""
+	buffering := r.Header.Get(bufferingHeaderName) != ""
 	// Either return buffered response or a stream
-	if !stream {
+	if buffering {
 		// Read the body and return buffered response
 		if readBody, readErr := res.ReadBody(); readErr == nil {
 			w.Write(readBody)
@@ -108,7 +108,7 @@ func HandleReq(w fhttp.ResponseWriter, r *fhttp.Request) {
 			log.Printf("Error buffering response: %v", readErr)
 		}
 	} else {
-		// Stream the response body
+		// stream the response body
 		_, err = io.Copy(w, res.RawBody)
 		if err != nil {
 			log.Printf("Error streaming response: %v", err)
@@ -178,7 +178,7 @@ func SetHeaders(s *azuretls.Session, headers fhttp.Header) {
 		proxyHeaderName,
 		redirectHeaderName,
 		timeoutHeaderName,
-		streamHeaderName,
+		bufferingHeaderName,
 	}
 Outer:
 	for k, v := range headers {
