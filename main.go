@@ -74,8 +74,6 @@ func HandleReq(w fhttp.ResponseWriter, r *fhttp.Request) {
 			w.WriteHeader(fhttp.StatusRequestTimeout)
 			return
 		} else {
-			// TODO: EOF error encountered here at one point. Doesn't seem to happen now.
-			// Potentially could be 'Connection' header issue
 			fmt.Print("other error:\n", err)
 			w.WriteHeader(fhttp.StatusInternalServerError)
 			return
@@ -99,7 +97,14 @@ func HandleReq(w fhttp.ResponseWriter, r *fhttp.Request) {
 
 	}
 
-	buffering := r.Header.Get(bufferingHeaderName) != ""
+	var buffering bool
+	switch b := r.Header.Get(bufferingHeaderName); b {
+	case "true", "True", "1":
+		buffering = true
+	default:
+		buffering = false
+
+	}
 	// Either return buffered response or a stream
 	if buffering {
 		// Read the body and return buffered response
@@ -126,7 +131,7 @@ func NewRequest(r *fhttp.Request) (*azuretls.Session, *azuretls.Request, error) 
 	session := azuretls.NewSession()
 	session.EnableLog()
 
-	// Parse and validate request URL
+	// Parse URL
 	urlHeader := r.Header.Get(urlHeaderName)
 
 	if urlHeader == "" {
@@ -138,7 +143,7 @@ func NewRequest(r *fhttp.Request) (*azuretls.Session, *azuretls.Request, error) 
 	// Parse redirects
 	var allowRedirects bool
 	switch rH := r.Header.Get(redirectHeaderName); rH {
-	case "true":
+	case "true", "True", "1":
 		allowRedirects = true
 	default:
 		allowRedirects = false
@@ -149,8 +154,6 @@ func NewRequest(r *fhttp.Request) (*azuretls.Session, *azuretls.Request, error) 
 	timeoutHeader := r.Header.Get(timeoutHeaderName)
 	t, err := strconv.Atoi(timeoutHeader)
 	if err != nil || t <= 0 {
-		// Probably dont log that on every request? Do it once and disable a flag or sth
-		// log.Println("Invalid timeout value supplied, defaulting to 30s.")
 		t = 30
 	}
 	timeout := time.Duration(t) * time.Second
