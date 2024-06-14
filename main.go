@@ -96,6 +96,7 @@ func HandleReq(w fhttp.ResponseWriter, r *fhttp.Request) {
 			fmt.Printf("Skipping \"%s\" header with invalid value", h)
 			continue
 		}
+
 	}
 
 	buffering := r.Header.Get(bufferingHeaderName) != ""
@@ -135,7 +136,14 @@ func NewRequest(r *fhttp.Request) (*azuretls.Session, *azuretls.Request, error) 
 	}
 
 	// Parse redirects
-	disableRedirects := r.Header.Get(redirectHeaderName) != ""
+	var allowRedirects bool
+	switch rH := r.Header.Get(redirectHeaderName); rH {
+	case "true":
+		allowRedirects = true
+	default:
+		allowRedirects = false
+
+	}
 
 	// Parse timeout
 	timeoutHeader := r.Header.Get(timeoutHeaderName)
@@ -162,7 +170,7 @@ func NewRequest(r *fhttp.Request) (*azuretls.Session, *azuretls.Request, error) 
 	req := &azuretls.Request{
 		Method:           r.Method,
 		Url:              urlHeader,
-		DisableRedirects: disableRedirects,
+		DisableRedirects: !allowRedirects,
 		IgnoreBody:       true,
 		Body:             body,
 	}
