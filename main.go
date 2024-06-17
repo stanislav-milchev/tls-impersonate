@@ -15,6 +15,7 @@ import (
 )
 
 var (
+	serverPort          = getEnv("TLS_PORT", "8082")
 	urlHeaderName       = getEnv("TLS_URL", "x-tls-url")
 	proxyHeaderName     = getEnv("TLS_PROXY", "x-tls-proxy")
 	bufferingHeaderName = getEnv("TLS_BUFFER", "x-tls-buffer")
@@ -23,30 +24,15 @@ var (
 )
 
 func main() {
-	port := ":8082"
+    port := fmt.Sprintf(":%s", serverPort)
 	log.Printf("Listening on localhost%s", port)
 	fhttp.HandleFunc("/", HandleReq)
 	fhttp.HandleFunc("/isalive", HandleIsAlive)
-	// dev testing endpoints
-	fhttp.HandleFunc("/sleep", TimeoutChecker)
-	fhttp.HandleFunc("/headers", handleHeaderYoink)
 
 	err := fhttp.ListenAndServe(port, nil)
 	if err != nil {
 		log.Fatalln("Error starting the HTTP server:", err)
 	}
-}
-
-// handleHeaderYoink is a helper endpoint to get the header values of the current request
-func handleHeaderYoink(_ fhttp.ResponseWriter, r *fhttp.Request) {
-	for header, value := range r.Header {
-		fmt.Printf("{\"%s\", \"%s\"}\n", header, value[0])
-	}
-}
-
-// TimeoutChecker is a helper endpoint to debug timeouts
-func TimeoutChecker(w fhttp.ResponseWriter, r *fhttp.Request) {
-	time.Sleep(time.Second * 45)
 }
 
 func HandleIsAlive(w fhttp.ResponseWriter, r *fhttp.Request) {
@@ -106,7 +92,7 @@ func HandleReq(w fhttp.ResponseWriter, r *fhttp.Request) {
 	}
 
 	w.WriteHeader(res.StatusCode)
-    // Either return buffered response or a stream
+	// Either return buffered response or a stream
 	if buffering {
 		if readBody, readErr := res.ReadBody(); readErr == nil {
 			w.Write(readBody)
