@@ -81,7 +81,6 @@ func HandleReq(w fhttp.ResponseWriter, r *fhttp.Request) {
 	}
 
 	// Forward the headers received
-	w.WriteHeader(res.StatusCode)
 	for h, v := range res.Header {
 		// Response we get is already decoded so this header will only cause issues with the
 		// client used for the request
@@ -105,7 +104,9 @@ func HandleReq(w fhttp.ResponseWriter, r *fhttp.Request) {
 		buffering = false
 
 	}
-	// Either return buffered response or a stream
+
+	w.WriteHeader(res.StatusCode)
+    // Either return buffered response or a stream
 	if buffering {
 		if readBody, readErr := res.ReadBody(); readErr == nil {
 			w.Write(readBody)
