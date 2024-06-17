@@ -14,13 +14,14 @@ Developed for primary use in web scraping to bypass blocking.
 
 - supply custom names for the 'dev' headers by passing env vars:
 ```
-var => defaultValue
-"TLS_PORT" => "8082"
-"TLS_URL" => "x-tls-url"
-"TLS_PROXY" => "x-tls-proxy"
-"TLS_BUFFER" => "x-tls-buffer"
-"TLS_REDIRECT" => "x-tls-allowredirect"
-"TLS_TIMEOUT" => "x-tls-timeout"
+envVar        => defaultValue
+
+TLS_PORT      => 8082
+TLS_URL       => x-tls-url
+TLS_PROXY     => x-tls-proxy
+TLS_BUFFER    => x-tls-buffer
+TLS_REDIRECT  => x-tls-allowredirect
+TLS_TIMEOUT   => x-tls-timeout
 ```
 
 # Coming soon
