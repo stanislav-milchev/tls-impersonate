@@ -15,6 +15,7 @@ import (
 )
 
 var (
+	serverPort          = getEnv("TLS_PORT", "8082")
 	urlHeaderName       = getEnv("TLS_URL", "x-tls-url")
 	proxyHeaderName     = getEnv("TLS_PROXY", "x-tls-proxy")
 	bufferingHeaderName = getEnv("TLS_BUFFER", "x-tls-buffer")
@@ -23,30 +24,15 @@ var (
 )
 
 func main() {
-	port := ":8082"
+    port := fmt.Sprintf(":%s", serverPort)
 	log.Printf("Listening on localhost%s", port)
 	fhttp.HandleFunc("/", HandleReq)
 	fhttp.HandleFunc("/isalive", HandleIsAlive)
-	// dev testing endpoints
-	fhttp.HandleFunc("/sleep", TimeoutChecker)
-	fhttp.HandleFunc("/headers", handleHeaderYoink)
 
 	err := fhttp.ListenAndServe(port, nil)
 	if err != nil {
 		log.Fatalln("Error starting the HTTP server:", err)
 	}
-}
-
-// handleHeaderYoink is a helper endpoint to get the header values of the current request
-func handleHeaderYoink(_ fhttp.ResponseWriter, r *fhttp.Request) {
-	for header, value := range r.Header {
-		fmt.Printf("{\"%s\", \"%s\"}\n", header, value[0])
-	}
-}
-
-// TimeoutChecker is a helper endpoint to debug timeouts
-func TimeoutChecker(w fhttp.ResponseWriter, r *fhttp.Request) {
-	time.Sleep(time.Second * 45)
 }
 
 func HandleIsAlive(w fhttp.ResponseWriter, r *fhttp.Request) {
@@ -81,7 +67,6 @@ func HandleReq(w fhttp.ResponseWriter, r *fhttp.Request) {
 	}
 
 	// Forward the headers received
-	w.WriteHeader(res.StatusCode)
 	for h, v := range res.Header {
 		// Response we get is already decoded so this header will only cause issues with the
 		// client used for the request
@@ -105,16 +90,16 @@ func HandleReq(w fhttp.ResponseWriter, r *fhttp.Request) {
 		buffering = false
 
 	}
+
+	w.WriteHeader(res.StatusCode)
 	// Either return buffered response or a stream
 	if buffering {
-		// Read the body and return buffered response
 		if readBody, readErr := res.ReadBody(); readErr == nil {
 			w.Write(readBody)
 		} else {
 			log.Printf("Error buffering response: %v", readErr)
 		}
 	} else {
-		// stream the response body
 		_, err = io.Copy(w, res.RawBody)
 		if err != nil {
 			log.Printf("Error streaming response: %v", err)
@@ -193,7 +178,6 @@ func SetHeaders(s *azuretls.Session, headers fhttp.Header) {
 	}
 Outer:
 	for k, v := range headers {
-		// Dont send the custom request headers
 		for _, header := range customHeaderNames {
 			if strings.ToLower(header) == strings.ToLower(k) {
 				continue Outer
@@ -203,7 +187,6 @@ Outer:
 		exist := browserHeaders.Get(strings.ToLower(k)) != ""
 		if !exist {
 			browserHeaders = append(browserHeaders, []string{k, v[0]})
-			//fmt.Printf("added %s\nwith val: %s\n", k, v[0])
 		}
 	}
 
