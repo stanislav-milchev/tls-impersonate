@@ -107,14 +107,12 @@ func HandleReq(w fhttp.ResponseWriter, r *fhttp.Request) {
 	}
 	// Either return buffered response or a stream
 	if buffering {
-		// Read the body and return buffered response
 		if readBody, readErr := res.ReadBody(); readErr == nil {
 			w.Write(readBody)
 		} else {
 			log.Printf("Error buffering response: %v", readErr)
 		}
 	} else {
-		// stream the response body
 		_, err = io.Copy(w, res.RawBody)
 		if err != nil {
 			log.Printf("Error streaming response: %v", err)
@@ -193,7 +191,6 @@ func SetHeaders(s *azuretls.Session, headers fhttp.Header) {
 	}
 Outer:
 	for k, v := range headers {
-		// Dont send the custom request headers
 		for _, header := range customHeaderNames {
 			if strings.ToLower(header) == strings.ToLower(k) {
 				continue Outer
@@ -203,7 +200,6 @@ Outer:
 		exist := browserHeaders.Get(strings.ToLower(k)) != ""
 		if !exist {
 			browserHeaders = append(browserHeaders, []string{k, v[0]})
-			//fmt.Printf("added %s\nwith val: %s\n", k, v[0])
 		}
 	}
 
