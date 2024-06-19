@@ -7,7 +7,7 @@ import (
 	"strings"
 	"testing"
 
-	http "github.com/Danny-Dasilva/fhttp"
+	http "github.com/Noooste/fhttp"
 	"github.com/stretchr/testify/assert"
 )
 

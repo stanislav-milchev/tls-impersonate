@@ -4,12 +4,13 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"net/url"
 	"os"
 	"strconv"
 	"strings"
 	"time"
 
-	fhttp "github.com/Danny-Dasilva/fhttp"
+	fhttp "github.com/Noooste/fhttp"
 	"github.com/Noooste/azuretls-client"
 	"github.com/stanislav-milchev/tls-impersonator/browser"
 )
@@ -51,7 +52,10 @@ func HandleReq(w fhttp.ResponseWriter, r *fhttp.Request) {
 	}
 
 	defer session.Close()
+
 	SetHeaders(session, r.Header)
+	SetCookies(req.Url, session, r.Cookies())
+
 	res, err := session.Do(req)
 
 	if err != nil {
@@ -191,6 +195,16 @@ Outer:
 	}
 
 	s.OrderedHeaders = browserHeaders
+}
+
+func SetCookies(url_ string, s *azuretls.Session, c []*fhttp.Cookie) {
+    parsed, err := url.Parse(url_)
+    if err != nil {
+        return
+    }
+
+    fmt.Println(c)
+    s.CookieJar.SetCookies(parsed, c)
 }
 
 func getEnv(key, fallback string) string {
