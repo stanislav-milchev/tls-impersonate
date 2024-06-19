@@ -1,5 +1,5 @@
 # TLS Impersonator
-![Coverage](https://img.shields.io/badge/Coverage-57.3%25-yellow)
+![Coverage](https://img.shields.io/badge/Coverage-59.1%25-yellow)
 
 # Introduction
 A Man-in-the-Middle proxy that transforms requests in order to impersonate real browser request.
