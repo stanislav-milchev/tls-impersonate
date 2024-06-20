@@ -203,7 +203,6 @@ func SetCookies(url_ string, s *azuretls.Session, c []*fhttp.Cookie) {
         return
     }
 
-    fmt.Println(c)
     s.CookieJar.SetCookies(parsed, c)
 }
 
